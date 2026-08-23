@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: Hazmat Compatibility Validator API
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:32710
+security:
+  - bearerAuth: []
+paths:
+  /healthz:
+    get: {security: [], responses: {"200": {description: Alive}}}
+  /readyz:
+    get: {responses: {"200": {description: Ready}, "503": {description: Draining}}}
+  /metrics:
+    get: {responses: {"200": {description: Prometheus metrics}}}
+  /v1/substances:
+    get: {responses: {"200": {description: Versioned substances}}}
+    post:
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/Substance'}}}}
+      responses: {"201": {description: Created}, "409": {description: Version conflict}}
+  /v1/rulebooks:
+    get: {responses: {"200": {description: Rulebooks}}}
+    post:
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/Rulebook'}}}}
+      responses: {"201": {description: Created}}
+  /v1/rulebooks/{version}/withdraw:
+    post:
+      parameters: [{name: version, in: path, required: true, schema: {type: string}}]
+      responses: {"204": {description: Withdrawn}}
+  /v1/manifests:
+    get: {parameters: [{name: id, in: query, schema: {type: string}}], responses: {"200": {description: Revisions}}}
+    post:
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ManifestRevision'}}}}
+      responses: {"201": {description: Draft created}}
+  /v1/manifests/{id}/{revision}/freeze:
+    post:
+      parameters: [{name: id, in: path, required: true, schema: {type: string}}, {name: revision, in: path, required: true, schema: {type: integer}}]
+      responses: {"200": {description: Frozen revision}}
+  /v1/validate:
+    post:
+      requestBody: {required: true, content: {application/json: {schema: {type: object, required: [manifest_id, revision]}}}}
+      responses: {"200": {description: Decision with evidence}}
+  /v1/reevaluate:
+    post:
+      requestBody: {required: true, content: {application/json: {schema: {type: object, required: [manifest_id, revision, rulebook_version]}}}}
+      responses: {"200": {description: Re-evaluated decision}}
+  /v1/batches/validate:
+    post:
+      parameters: [{name: Idempotency-Key, in: header, required: true, schema: {type: string}}]
+      requestBody: {required: true, content: {application/x-ndjson: {schema: {type: string, format: binary}}}}
+      responses: {"200": {description: NDJSON row results}}
+  /v1/quarantine:
+    get: {parameters: [{name: batch_id, in: query, schema: {type: string}}], responses: {"200": {description: Isolated errors}}}
+  /admin/drain:
+    post: {responses: {"204": {description: Draining}}}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer}
+  schemas:
+    Substance: {type: object, required: [id, version, un_number, name, classifications, packaging_group, state, temperature, concentration, effective_from]}
+    Rulebook: {type: object, required: [id, version, effective_from, rules]}
+    ManifestRevision: {type: object, required: [manifest_id, revision, rulebook_version, mode, effective_at, layout, containers, items]}

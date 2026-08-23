@@ -1,0 +1,14 @@
+syntax = "proto3";
+package hazmat.compatibility.v1;
+option go_package = "github.com/enterprise-labs/hazmat-compatibility-validator/api/gen";
+
+message Interval { double min = 1; double max = 2; string unit = 3; }
+message Classification { string primary = 1; repeated string secondary = 2; }
+message SubstanceRef { string id = 1; int64 version = 2; }
+message ManifestItem { string id = 1; SubstanceRef substance = 2; Interval quantity = 3; Interval concentration = 4; Interval temperature = 5; string container_id = 6; string compartment_id = 7; }
+message DecisionRequest { string manifest_id = 1; int64 revision = 2; }
+enum Decision { DECISION_UNSPECIFIED = 0; PROHIBITED = 1; CONDITIONAL = 2; ALLOWED = 3; INDETERMINATE = 4; }
+message Evidence { string path = 1; string value_json = 2; string source = 3; }
+message Conflict { string left_item = 1; string right_item = 2; repeated string path = 3; string message = 4; }
+message DecisionResult { string id = 1; string manifest_id = 2; int64 revision = 3; string rulebook_version = 4; string input_digest = 5; Decision decision = 6; repeated Evidence facts = 7; repeated Conflict conflicts = 8; repeated string missing = 9; }
+service CompatibilityValidator { rpc Validate(DecisionRequest) returns (DecisionResult); }
