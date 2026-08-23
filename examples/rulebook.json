@@ -1,0 +1,10 @@
+{
+  "id": "ground-hazmat",
+  "version": "2026.08",
+  "effective_from": "2026-08-21T23:00:00Z",
+  "rules": [
+    {"id":"oxidizer-flammable-ban","priority":100,"predicate":"class_pair","class_a":"3","class_b":"5.1","outcome":"prohibited","message":"flammable liquid and oxidizer may not share this load"},
+    {"id":"acid-flammable-conditional","priority":80,"predicate":"class_pair","class_a":"3","class_b":"8","outcome":"conditional","message":"flammable liquid and corrosive require segregation review"},
+    {"id":"flammable-pair-allow","priority":50,"predicate":"class_pair","class_a":"3","class_b":"3","outcome":"allowed","message":"compatible packaged flammable liquids are allowed"}
+  ]
+}
