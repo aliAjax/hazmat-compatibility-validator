@@ -1,0 +1,12 @@
+services:
+  validator:
+    build: {context: .., dockerfile: deploy/Dockerfile}
+    ports: ["32710:32710"]
+    environment:
+      HAZMAT_LISTEN_ADDR: ":32710"
+      HAZMAT_ADMIN_TOKEN: "hazmat-admin-token"
+    stop_grace_period: 15s
+  postgres:
+    image: postgres:17-alpine
+    profiles: [control-plane]
+    environment: {POSTGRES_USER: hazmat, POSTGRES_PASSWORD: hazmat, POSTGRES_DB: hazmat}
