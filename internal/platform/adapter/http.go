@@ -19,6 +19,7 @@ import (
 	manifest "github.com/enterprise-labs/hazmat-compatibility-validator/internal/manifest/domain"
 	manifestinfra "github.com/enterprise-labs/hazmat-compatibility-validator/internal/manifest/infrastructure"
 	platform "github.com/enterprise-labs/hazmat-compatibility-validator/internal/platform/domain"
+	quantityapp "github.com/enterprise-labs/hazmat-compatibility-validator/internal/quantity/application"
 	rulebook "github.com/enterprise-labs/hazmat-compatibility-validator/internal/rulebook/domain"
 	ruleinfra "github.com/enterprise-labs/hazmat-compatibility-validator/internal/rulebook/infrastructure"
 	substanceapp "github.com/enterprise-labs/hazmat-compatibility-validator/internal/substance/application"
@@ -332,6 +333,7 @@ func respond(w http.ResponseWriter, status int, value any) {
 	_ = json.NewEncoder(w).Encode(value)
 }
 func problem(w http.ResponseWriter, status int, err error) {
-	respond(w, status, map[string]any{"error": err.Error(), "status": status})
+	code := quantityapp.Classify(err)
+	respond(w, status, map[string]any{"error": err.Error(), "status": status, "code": code})
 }
 func method(w http.ResponseWriter) { http.Error(w, "method not allowed", 405) }

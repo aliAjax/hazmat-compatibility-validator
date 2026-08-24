@@ -14,7 +14,7 @@ func (i Importer) Validate(value substance.Substance) error {
 		return err
 	}
 	if _, err := i.Converter.Convert(value.Temperature, quantity.Temperature); err != nil {
-		return fmt.Errorf("temperature: %v", err)
+		return fmt.Errorf("temperature: %w", err)
 	}
 	if _, err := i.Converter.Convert(value.Concentration, quantity.Concentration); err != nil {
 		return fmt.Errorf("concentration: %w", err)

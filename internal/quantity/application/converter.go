@@ -31,14 +31,14 @@ var units = map[string]definition{
 
 func (Converter) Convert(input quantity.Interval, dimension quantity.Dimension) (quantity.Converted, error) {
 	if err := input.Validate(); err != nil {
-		return quantity.Converted{}, fmt.Errorf("input interval rejected: %v", err)
+		return quantity.Converted{}, fmt.Errorf("input interval rejected: %w", err)
 	}
 	d, ok := units[strings.ToLower(input.Unit)]
 	if !ok {
-		return quantity.Converted{}, fmt.Errorf("unit %q is unknown", input.Unit)
+		return quantity.Converted{}, fmt.Errorf("%w: unit %q is unknown", ErrUnknownUnit, input.Unit)
 	}
 	if d.dimension != dimension {
-		return quantity.Converted{}, fmt.Errorf("unit %q is not valid for %s", input.Unit, dimension)
+		return quantity.Converted{}, fmt.Errorf("%w: unit %q is not valid for %s", ErrDimensionMismatch, input.Unit, dimension)
 	}
 	convert := func(v float64) float64 {
 		if d.dimension == quantity.Temperature && d.offset == -32 {

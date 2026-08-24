@@ -26,7 +26,7 @@ func (i Importer) Validate(value manifest.Revision) error {
 	}
 	for _, c := range value.Containers {
 		if _, err := i.Converter.Convert(quantity.Interval{Min: c.MaxQuantity, Max: c.MaxQuantity, Unit: c.QuantityUnit}, quantity.Mass); err != nil {
-			return fmt.Errorf("container %s capacity: %v", c.ID, err)
+			return fmt.Errorf("container %s capacity: %w", c.ID, err)
 		}
 	}
 	return nil

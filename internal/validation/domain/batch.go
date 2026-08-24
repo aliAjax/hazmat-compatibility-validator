@@ -10,6 +10,7 @@ type Quarantine struct {
 	Line        int       `json:"line"`
 	InputDigest string    `json:"input_digest"`
 	Error       string    `json:"error"`
+	Code        string    `json:"code,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 type BatchItem struct {
@@ -20,6 +21,7 @@ type BatchItem struct {
 	Decision string `json:"decision,omitempty"`
 	Reused   bool   `json:"reused,omitempty"`
 	Error    string `json:"error,omitempty"`
+	Code     string `json:"code,omitempty"`
 }
 type QuarantineStore struct {
 	mu    sync.RWMutex

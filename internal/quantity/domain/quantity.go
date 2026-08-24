@@ -26,7 +26,7 @@ type Interval struct {
 
 func (i Interval) Validate() error {
 	if math.IsNaN(i.Min) || math.IsNaN(i.Max) || math.IsInf(i.Min, 0) || math.IsInf(i.Max, 0) || i.Min > i.Max || i.Unit == "" {
-		return fmt.Errorf("invalid interval: min=%g max=%g unit=%q", i.Min, i.Max, i.Unit)
+		return fmt.Errorf("%w: invalid interval: min=%g max=%g unit=%q", ErrInvalidInterval, i.Min, i.Max, i.Unit)
 	}
 	return nil
 }

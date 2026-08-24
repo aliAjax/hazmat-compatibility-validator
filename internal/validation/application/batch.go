@@ -14,6 +14,7 @@ import (
 
 	manifestapp "github.com/enterprise-labs/hazmat-compatibility-validator/internal/manifest/application"
 	manifest "github.com/enterprise-labs/hazmat-compatibility-validator/internal/manifest/domain"
+	quantityapp "github.com/enterprise-labs/hazmat-compatibility-validator/internal/quantity/application"
 	validation "github.com/enterprise-labs/hazmat-compatibility-validator/internal/validation/domain"
 )
 
@@ -124,7 +125,8 @@ func (b BatchProcessor) quarantine(batch string, line int, digest string, err er
 	if b.Clock != nil {
 		at = b.Clock.Now()
 	}
-	b.Quarantine.Add(validation.Quarantine{BatchID: batch, Line: line, InputDigest: digest, Error: err.Error(), CreatedAt: at})
-	return validation.BatchItem{BatchID: batch, Line: line, Status: "quarantined", Error: err.Error()}
+	code := quantityapp.Classify(err)
+	b.Quarantine.Add(validation.Quarantine{BatchID: batch, Line: line, InputDigest: digest, Error: err.Error(), Code: code, CreatedAt: at})
+	return validation.BatchItem{BatchID: batch, Line: line, Status: "quarantined", Error: err.Error(), Code: code}
 }
 func isCanceled(err error) bool { return err == context.Canceled || err == context.DeadlineExceeded }
