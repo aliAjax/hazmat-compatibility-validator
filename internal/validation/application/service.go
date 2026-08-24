@@ -57,7 +57,7 @@ func (s Service) ValidateRevision(ctx context.Context, m manifest.Revision) (evi
 	}
 	book, err := s.Rulebooks.Get(ctx, m.RulebookVersion, m.EffectiveAt)
 	if err != nil {
-		return evidence.Result{}, false, fmt.Errorf("resolve rulebook %s: %v", m.RulebookVersion, err)
+		return evidence.Result{}, false, fmt.Errorf("resolve rulebook %s: %w", m.RulebookVersion, err)
 	}
 	resolved := map[string]substance.Substance{}
 	missing := []string{}
@@ -85,7 +85,7 @@ func (s Service) ValidateRevision(ctx context.Context, m manifest.Revision) (evi
 func (s Service) Reevaluate(ctx context.Context, id string, revision int64, version string, at time.Time) (evidence.Result, bool, error) {
 	m, err := s.Manifests.Get(ctx, id, revision)
 	if err != nil {
-		return evidence.Result{}, false, fmt.Errorf("reevaluate manifest %s/%d: %v", id, revision, err)
+		return evidence.Result{}, false, fmt.Errorf("reevaluate manifest %s/%d: %w", id, revision, err)
 	}
 	m.RulebookVersion = version
 	if !at.IsZero() {

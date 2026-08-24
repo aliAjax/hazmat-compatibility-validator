@@ -6,6 +6,7 @@ import (
 	"crypto/subtle"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -332,6 +333,25 @@ func respond(w http.ResponseWriter, status int, value any) {
 	_ = json.NewEncoder(w).Encode(value)
 }
 func problem(w http.ResponseWriter, status int, err error) {
-	respond(w, status, map[string]any{"error": err.Error(), "status": status})
+	body := map[string]any{"error": err.Error(), "status": status}
+	if code := classifyError(err); code != "" {
+		body["type"] = code
+	}
+	respond(w, status, body)
+}
+
+// classifyError maps a wrapped sentinel error to a stable, machine-readable
+// type code so callers can branch on the real failure rather than parsing text.
+// It returns an empty string when no known sentinel is matched.
+func classifyError(err error) string {
+	switch {
+	case errors.Is(err, ruleinfra.ErrVersionExists):
+		return "rulebook_version_exists"
+	case errors.Is(err, ruleinfra.ErrVersionMissing):
+		return "rulebook_version_missing"
+	case errors.Is(err, ruleinfra.ErrVersionWithdrawn):
+		return "rulebook_version_withdrawn"
+	}
+	return ""
 }
 func method(w http.ResponseWriter) { http.Error(w, "method not allowed", 405) }

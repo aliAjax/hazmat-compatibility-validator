@@ -32,7 +32,7 @@ func (r *Repository) Save(ctx context.Context, b rulebook.Rulebook) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if _, ok := r.items[b.Version]; ok {
-		return fmt.Errorf("save rulebook %s: %v", b.Version, ErrVersionExists)
+		return fmt.Errorf("save rulebook %s: %w", b.Version, ErrVersionExists)
 	}
 	r.items[b.Version] = b
 	return nil
@@ -45,10 +45,10 @@ func (r *Repository) Get(ctx context.Context, version string, at time.Time) (rul
 	defer r.mu.RUnlock()
 	b, ok := r.items[version]
 	if !ok {
-		return b, fmt.Errorf("get rulebook %s: %v", version, ErrVersionMissing)
+		return b, fmt.Errorf("get rulebook %s: %w", version, ErrVersionMissing)
 	}
 	if !b.EffectiveAt(at) {
-		return b, fmt.Errorf("get rulebook %s: %v", version, ErrVersionWithdrawn)
+		return b, fmt.Errorf("get rulebook %s: %w", version, ErrVersionWithdrawn)
 	}
 	return b, nil
 }
@@ -63,7 +63,7 @@ func (r *Repository) Withdraw(ctx context.Context, version string, at time.Time)
 	defer r.mu.Unlock()
 	b, ok := r.items[version]
 	if !ok {
-		return fmt.Errorf("withdraw rulebook %s: %v", version, ErrVersionMissing)
+		return fmt.Errorf("withdraw rulebook %s: %w", version, ErrVersionMissing)
 	}
 	if b.WithdrawnAt != nil {
 		return nil
